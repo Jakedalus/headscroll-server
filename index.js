@@ -11,5 +11,5 @@ app.use(bodyParser.json());
 
 
 app.listen(PORT, function() {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
