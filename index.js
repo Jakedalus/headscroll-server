@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 
 const errorHandler = require('./handlers/error');
 const authRoutes = require('./routes/auth');
+const postsRoutes = require('./routes/posts');
+const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 
 const PORT = process.env.PORT || 8081;
 
@@ -13,6 +15,12 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
+
+app.use('/api/users/:id/messages',
+  loginRequired,
+  ensureCorrectUser,
+  postsRoutes
+);
 
 
 
