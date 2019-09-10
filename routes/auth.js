@@ -3,42 +3,6 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const db = require('../models');
 
-router.post('/signin', async function(req, res, next) {
-  console.log('/signin', req, res);
-  try {
-    let user = await db.User.findOne({
-      email: req.body.email
-    });
-    let { id, username, profileImageUrl } = user;
-    let isMatch = await user.comparePassword(req.body.password);
-
-    if (isMatch) {
-      let token = jwt.sign({
-        id,
-        username,
-        profileImageUrl
-      }, process.env.SECRET_KEY);
-
-      return res.status(200).json({
-        id,
-        username,
-        profileImageUrl,
-        token
-      });
-    } else {
-      return next({
-        status: 400,
-        message: 'Invalid Email/Password'
-      });
-    }
-  } catch (err) {
-    return next({
-      status: 400,
-      message: 'Invalid email/password'
-    });
-  }
-});
-
 router.post('/signup', async function(req, res, next) {
   try {
     let user = await db.User.create(req.body);
@@ -65,6 +29,44 @@ router.post('/signup', async function(req, res, next) {
     return next({
       status: 400,
       message: err.message
+    });
+  }
+});
+
+router.post('/signin', async function(req, res, next) {
+  debugger;
+  try {
+    debugger;
+    let user = await db.User.findOne({
+      email: req.body.email
+    });
+    debugger;
+    let { id, username, profileImageUrl } = user;
+    let isMatch = await user.comparePassword(req.body.password);
+
+    if (isMatch) {
+      let token = jwt.sign({
+        id,
+        username,
+        profileImageUrl
+      }, process.env.SECRET_KEY);
+
+      return res.status(200).json({
+        id,
+        username,
+        profileImageUrl,
+        token
+      });
+    } else {
+      return next({
+        status: 400,
+        message: 'Invalid Email/Password, no match'
+      });
+    }
+  } catch (err) {
+    return next({
+      status: 400,
+      message: 'Invalid email/password, catch block'
     });
   }
 });
