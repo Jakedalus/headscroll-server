@@ -4,10 +4,12 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
+const db = require("./models");
 const errorHandler = require('./handlers/error');
 const authRoutes = require('./routes/auth');
 const postsRoutes = require('./routes/posts');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
+const { getFriends } = require('./middleware/friends');
 
 const PORT = process.env.PORT || 8081;
 
@@ -16,12 +18,27 @@ app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
 
-app.use('/api/users/:id/messages',
+app.use('/api/users/:id/posts',
   loginRequired,
   ensureCorrectUser,
   postsRoutes
 );
 
+app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next) {
+  try {
+    console.log('friends:', req.friends);
+    // let posts = await db.Post.find({ user: { $in: req.friends }})
+    let posts = await db.Post.find()
+      .sort({createdAt: 'desc'})
+      .populate('user', {
+        username: true,
+        profileImageUrl: true
+      });
+    return res.status(200).json(posts);
+  } catch (err) {
+    return next(err);
+  }
+});
 
 
 app.use(function(req, res, next) {
