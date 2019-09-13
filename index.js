@@ -8,6 +8,7 @@ const db = require("./models");
 const errorHandler = require('./handlers/error');
 const authRoutes = require('./routes/auth');
 const postsRoutes = require('./routes/posts');
+const usersRoutes = require('./routes/users');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const { getFriends } = require('./middleware/friends');
 
@@ -18,16 +19,21 @@ app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
 
+// posts routes to create and delete posts
 app.use('/api/users/:id/posts',
   loginRequired,
   ensureCorrectUser,
   postsRoutes
 );
 
+// usersRoutes to display user info and add friends
+app.use('/api/users/:id/profile', loginRequired, usersRoutes);
+
+// GET scroll route that displays friends' posts
 app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next) {
   try {
-    console.log('friends:', req.friends);
-    // let posts = await db.Post.find({ user: { $in: req.friends }})
+    console.log('friends:', res.locals.friends);
+    // let posts = await db.Post.find({ user: { $in: res.locals.friends }})
     let posts = await db.Post.find()
       .sort({createdAt: 'desc'})
       .populate('user', {

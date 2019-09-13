@@ -12,7 +12,7 @@ exports.getFriends = function(req, res, next) {
         console.log('getFriends: ', decoded, user);
         console.log();
         // return res.send({friends});
-        req.friends = friends;
+        res.locals.friends = friends;
         return next();
       } else {
         return next({
