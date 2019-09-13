@@ -35,8 +35,20 @@ router.route('/').post(async function(req, res, next) {
 
         console.log('users route, POST, user, _id:', pickedRequestedUser, pickedRequestingUser);
 
-        requestedUser.requests.push(pickedRequestingUser._id);
-        await requestedUser.save();
+        if (requestingUser.requests.includes(pickedRequestedUser._id)) {
+          requestingUser.requests.splice(requestingUser.requests.indexOf(pickedRequestedUser._id), 1);
+          requestedUser.friends.push(pickedRequestingUser._id);
+          requestingUser.friends.push(pickedRequestedUser._id);
+          await requestedUser.save(); 
+          await requestingUser.save(); 
+        } else {
+          if (!requestedUser.requests.includes(pickedRequestingUser._id) && !requestedUser.friends.includes(pickedRequestingUser._id)) {
+            requestedUser.requests.push(pickedRequestingUser._id);
+            await requestedUser.save(); 
+          }
+        }
+
+        
 
         return res.status(200).json(pickedRequestedUser);
         
