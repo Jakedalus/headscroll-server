@@ -8,7 +8,7 @@ const db = require("./models");
 const errorHandler = require('./handlers/error');
 const authRoutes = require('./routes/auth');
 const postsRoutes = require('./routes/posts');
-const usersRoutes = require('./routes/users');
+const friendssRoutes = require('./routes/friends');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const { getFriends } = require('./middleware/friends');
 
@@ -26,8 +26,8 @@ app.use('/api/users/:id/posts',
   postsRoutes
 );
 
-// usersRoutes to display user info and add friends
-app.use('/api/users/:id/profile', loginRequired, usersRoutes);
+// friendssRoutes to display friend info and add/removefriends
+app.use('/api/users/:id/profile', loginRequired, friendssRoutes);
 
 // GET scroll route that displays friends' posts
 app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next) {

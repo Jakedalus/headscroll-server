@@ -9,11 +9,35 @@ router.route('/').get(async function(req, res, next) {
 
     let user = await db.User.findById(req.params.id);
 
-    const picked = (({ _id, email, posts, friends }) => ({ _id, email, posts, friends  }))(user);
+    const token = req.headers.authorization.split(" ")[1];
+    jwt.verify(token, process.env.SECRET_KEY, async function(err, decoded) {
+      if (decoded) {
+        // if you are friends with them, you see the whole profile
+        let requestingUser = await db.User.findById(decoded.id);
+        if (user.friends.includes(requestingUser._id)) {
+          const picked = (({ _id, email, username, posts, friends }) => ({ _id, email, username, posts, friends }))(user);
 
-    console.log('users route, GET, user:', picked);
+          console.log('users route, GET, user:', picked);
 
-    return res.status(200).json(picked);
+          return res.status(200).json(picked);
+        // not friends with the user
+        } else {
+          const picked = (({ _id, email, username }) => ({ _id, email, username  }))(user);
+
+          console.log('users route, GET, user:', picked);
+
+          return res.status(200).json(picked);
+        }
+      } else {
+        return next({
+          status: 401,
+          message: 'Please log in first'
+        });
+      }
+
+    });
+
+    
 
   } catch (err) {
     return next(err);
@@ -35,6 +59,7 @@ router.route('/').post(async function(req, res, next) {
 
         console.log('users route, POST, user, _id:', pickedRequestedUser, pickedRequestingUser);
 
+        // if the other user has already requested you as a friend
         if (requestingUser.requests.includes(pickedRequestedUser._id)) {
           requestingUser.requests.splice(requestingUser.requests.indexOf(pickedRequestedUser._id), 1);
           requestedUser.friends.push(pickedRequestingUser._id);
@@ -42,6 +67,7 @@ router.route('/').post(async function(req, res, next) {
           await requestedUser.save(); 
           await requestingUser.save(); 
         } else {
+          // if you have not already sent a request or are not already friends, send a request to the user
           if (!requestedUser.requests.includes(pickedRequestingUser._id) && !requestedUser.friends.includes(pickedRequestingUser._id)) {
             requestedUser.requests.push(pickedRequestingUser._id);
             await requestedUser.save(); 
