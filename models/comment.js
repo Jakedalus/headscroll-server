@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const User = require('./user');
+const Post = require('./post');
 
 const commentSchema = new mongoose.Schema({
   text: {
@@ -22,12 +23,15 @@ const commentSchema = new mongoose.Schema({
 
 commentSchema.pre('remove', async function(next) {
   try {
+    // console.log('pre remove comment:', this);
     let user = await User.findById(this.user);
     user.comments.remove(this.id);
+    // console.log('user', user);
     await user.save();
 
     let post = await Post.findById(this.post);
     post.comments.remove(this.id);
+    // console.log('post', post);
     await post.save();
 
     return next();

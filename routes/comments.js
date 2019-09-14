@@ -42,11 +42,11 @@ router.route('/:comment_id').get(async function(req, res, next) {
   }
 });
 
-// // update a post
+// // update a comment
 router.route('/:comment_id').put(async function(req, res, next) {
   try {
     let comment = await db.Comment.findOneAndUpdate({_id: req.params.comment_id}, {text: req.body.text});
-    console.log('update post route:', comment, req.body);
+    console.log('UPDATE comment route:', comment, req.body);
 
     return res.status(200).json(comment);
   } catch (err) {
@@ -54,15 +54,18 @@ router.route('/:comment_id').put(async function(req, res, next) {
   }
 });
 
-// // delete a post
-// router.route('/:post_id').delete(async function(req, res, next) {
-//   try {
-//     let foundPost = await db.Post.findById(req.params.post_id);
-//     await foundPost.remove();
-//     return res.status(200).json(foundPost);
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
+// // delete a comment
+router.route('/:comment_id').delete(async function(req, res, next) {
+  try {
+    let foundComment = await db.Comment.findById(req.params.comment_id);
+
+    console.log('DELETE comment route:', foundComment);
+
+    await foundComment.remove();
+    return res.status(200).json(foundComment);
+  } catch (err) {
+    return next(err);
+  }
+});
 
 module.exports = router;
