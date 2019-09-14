@@ -19,7 +19,7 @@ app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
 
-// posts routes to create and delete posts
+// posts routes to create, update, and delete posts
 app.use('/api/users/:id/posts',
   loginRequired,
   ensureCorrectUser,
