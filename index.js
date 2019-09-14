@@ -8,7 +8,8 @@ const db = require("./models");
 const errorHandler = require('./handlers/error');
 const authRoutes = require('./routes/auth');
 const postsRoutes = require('./routes/posts');
-const friendssRoutes = require('./routes/friends');
+const commentsRoutes = require('./routes/comments');
+const friendsRoutes = require('./routes/friends');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const { getFriends } = require('./middleware/friends');
 
@@ -26,8 +27,15 @@ app.use('/api/users/:id/posts',
   postsRoutes
 );
 
+// comments routes to create, update, and delete posts
+app.use('/api/users/:id/posts/:post_id',
+  loginRequired,
+  ensureCorrectUser,
+  commentsRoutes
+);
+
 // friendssRoutes to display friend info and add/removefriends
-app.use('/api/users/:id/profile', loginRequired, friendssRoutes);
+app.use('/api/users/:id/profile', loginRequired, friendsRoutes);
 
 // GET scroll route that displays friends' posts
 app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next) {
