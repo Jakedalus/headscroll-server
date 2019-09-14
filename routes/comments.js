@@ -32,27 +32,27 @@ router.route('/').post(async function(req, res, next) {
   }
 });
 
-// get a specific post
-// router.route('/:post_id').get(async function(req, res, next) {
-//   try {
-//     let post = await db.Post.findById(req.params.post_id);
-//     return res.status(200).json(post);
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
+// get a specific comment
+router.route('/:comment_id').get(async function(req, res, next) {
+  try {
+    let comment = await db.Comment.findById(req.params.comment_id);
+    return res.status(200).json(comment);
+  } catch (err) {
+    return next(err);
+  }
+});
 
 // // update a post
-// router.route('/:post_id').put(async function(req, res, next) {
-//   try {
-//     let post = await db.Post.findOneAndUpdate({_id: req.params.post_id}, {text: req.body.text});
-//     console.log('update post route:', post, req.body);
+router.route('/:comment_id').put(async function(req, res, next) {
+  try {
+    let comment = await db.Comment.findOneAndUpdate({_id: req.params.comment_id}, {text: req.body.text});
+    console.log('update post route:', comment, req.body);
 
-//     return res.status(200).json(post);
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
+    return res.status(200).json(comment);
+  } catch (err) {
+    return next(err);
+  }
+});
 
 // // delete a post
 // router.route('/:post_id').delete(async function(req, res, next) {

@@ -28,7 +28,7 @@ app.use('/api/users/:id/posts',
 );
 
 // comments routes to create, update, and delete posts
-app.use('/api/users/:id/posts/:post_id',
+app.use('/api/users/:id/posts/:post_id/comments',
   loginRequired,
   ensureCorrectUser,
   commentsRoutes
