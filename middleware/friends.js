@@ -13,6 +13,7 @@ exports.getFriends = function(req, res, next) {
         console.log();
         // return res.send({friends});
         res.locals.friends = friends;
+        // res.locals.you = user;
         return next();
       } else {
         return next({

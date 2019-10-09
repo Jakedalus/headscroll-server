@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
+var _ = require('lodash');
 
 const db = require("./models");
 const errorHandler = require('./handlers/error');
@@ -13,21 +14,58 @@ const friendsRoutes = require('./routes/friends');
 const { loginRequired, ensureCorrectUser } = require('./middleware/auth');
 const { getFriends } = require('./middleware/friends');
 
-const PORT = process.env.PORT || 8081;
+const PORT = process.env.PORT || 5051;
 
 app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
 
-// posts routes to create, update, and delete posts
+// GET specific post 
+app.get('/api/users/:id/posts/:post_id/', loginRequired, getFriends, async function(req, res, next) {
+  console.log('GET /api/users/:id/posts/:post_id/');
+  try {
+    let post = await db.Post.findById(req.params.post_id);
+    let comments = await db.Comment.find({post: req.params.post_id})
+      .sort({createdAt: 'desc'})
+      .populate('user', {
+        username: true,
+        profileImageUrl: true
+      });
+    console.log('GET /:post_id', post, comments);
+    return res.status(200).json({post, comments});
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// other posts routes to create, update, and delete posts: all require ensureCorrectUser
 app.use('/api/users/:id/posts',
   loginRequired,
   ensureCorrectUser,
   postsRoutes
 );
 
-// comments routes to create, update, and delete posts
+// get comments on a post
+// app.get('/api/users/:id/posts/:post_id/comments', loginRequired, getFriends, async function(req, res, next) {
+//   console.log('!!comments get route!');
+//   try {
+//     // console.log('friends:', res.locals.friends);
+//     // let posts = await db.Post.find({ user: { $in: res.locals.friends }})
+//     console.log('routes/comments, get "/", req:', req);
+//     // let posts = await db.Comment.find({post: })
+//     //   .sort({createdAt: 'desc'})
+//     //   .populate('user', {
+//     //     username: true,
+//     //     profileImageUrl: true
+//     //   });
+//     // return res.status(200).json(posts);
+//   } catch (err) {
+//     return next(err);
+//   }
+// });
+
+// comments routes to create, update, and delete comments
 app.use('/api/users/:id/posts/:post_id/comments',
   loginRequired,
   ensureCorrectUser,
@@ -37,18 +75,35 @@ app.use('/api/users/:id/posts/:post_id/comments',
 // friendssRoutes to display friend info and add/removefriends
 app.use('/api/users/:id/profile', loginRequired, friendsRoutes);
 
+
+
 // GET scroll route that displays friends' posts
 app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next) {
   try {
-    console.log('friends:', res.locals.friends);
-    // let posts = await db.Post.find({ user: { $in: res.locals.friends }})
-    let posts = await db.Post.find()
+    // console.log('/api/scroll, friends:', res.locals.friends);
+    let posts = await db.Post.find({ user: { $in: res.locals.friends }})
       .sort({createdAt: 'desc'})
       .populate('user', {
         username: true,
         profileImageUrl: true
       });
+    
     return res.status(200).json(posts);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// GET search route for finding users to friend
+app.post('/api/search', loginRequired, async function(req, res, next) {
+  try {
+    console.log('/api/search route:', req.body, req.query);
+    let foundUser = await db.User.findOne({username: req.body.query});
+    // let foundUser = await db.User.find({email: req.body.query});
+
+    const pickedUser = _.pick(foundUser, ['username', 'email', '_id']);
+
+    res.status(200).json({pickedUser});
   } catch (err) {
     return next(err);
   }

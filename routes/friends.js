@@ -3,28 +3,58 @@ const router = express.Router({mergeParams: true});
 const db = require('../models');
 const jwt = require('jsonwebtoken');
 
+// GET profile of a friend
 router.route('/').get(async function(req, res, next) {
   try {
     console.log('params:', req.params);
 
-    let user = await db.User.findById(req.params.id);
+    let user = await db.User.findById(req.params.id); // the user you are looking at
 
     const token = req.headers.authorization.split(" ")[1];
     jwt.verify(token, process.env.SECRET_KEY, async function(err, decoded) {
       if (decoded) {
-        // if you are friends with them, you see the whole profile
-        let requestingUser = await db.User.findById(decoded.id);
-        if (user.friends.includes(requestingUser._id)) {
-          const picked = (({ _id, email, username, posts, friends }) => ({ _id, email, username, posts, friends }))(user);
+        
+        let you = await db.User.findById(decoded.id); // you
+        console.log('req.params.id === you._id',req.params.id, you._id, req.params.id == you._id);
+        // if you are friends with them, or you're on your own profile, you see the whole profile
+        if (user.friends.includes(you._id) || req.params.id == you._id) {
+          const picked = (({ _id, email, username, posts, friends, isFriend=true }) => ({
+             _id, email, username, posts, friends, isFriend  
+          }))(user);
 
-          console.log('users route, GET, user:', picked);
+
+          let friends = [];
+          for (let friend of picked.friends) {
+            console.log('Looking up friend:', friend);
+            let pal = await db.User.findById(friend);
+            const pickedPal = (({ 
+              _id, 
+              email, 
+              username
+            }) => ({ 
+              _id, email, username  
+            }))(pal);
+            friends.push(pickedPal);
+          }
+
+          picked.friends = friends;
+
+          console.log('users route, GET, user, is friends:', picked);
 
           return res.status(200).json(picked);
         // not friends with the user
         } else {
-          const picked = (({ _id, email, username }) => ({ _id, email, username  }))(user);
+          const picked = (({ 
+            _id, 
+            email, 
+            username, 
+            youRequestedAlready=user.requests.includes(you._id), 
+            isFriend=false 
+          }) => ({ 
+            _id, email, username, youRequestedAlready, isFriend  
+          }))(user);
 
-          console.log('users route, GET, user:', picked);
+          console.log('users route, GET, user, is not friends:', picked);
 
           return res.status(200).json(picked);
         }
@@ -44,6 +74,7 @@ router.route('/').get(async function(req, res, next) {
   }
 });
 
+// Send or Accept a freind request
 router.route('/').post(async function(req, res, next) {
   try {
     console.log('params:', req.params);
@@ -51,32 +82,32 @@ router.route('/').post(async function(req, res, next) {
     const token = req.headers.authorization.split(" ")[1];
     jwt.verify(token, process.env.SECRET_KEY, async function(err, decoded) {
       if (decoded) {
-        let requestingUser = await db.User.findById(decoded.id);
-        let requestedUser = await db.User.findById(req.params.id);
+        let you = await db.User.findById(decoded.id); // you
+        let them = await db.User.findById(req.params.id); // them
 
-        const pickedRequestedUser = (({ _id }) => ({ _id }))(requestedUser);
-        const pickedRequestingUser = (({ _id }) => ({ _id }))(requestingUser);
+        const theirId = (({ _id }) => ({ _id }))(them);
+        const yourId = (({ _id }) => ({ _id }))(you);
 
-        console.log('users route, POST, user, _id:', pickedRequestedUser, pickedRequestingUser);
+        console.log('users route, POST, user, _id:', theirId, yourId);
 
         // if the other user has already requested you as a friend
-        if (requestingUser.requests.includes(pickedRequestedUser._id)) {
-          requestingUser.requests.splice(requestingUser.requests.indexOf(pickedRequestedUser._id), 1);
-          requestedUser.friends.push(pickedRequestingUser._id);
-          requestingUser.friends.push(pickedRequestedUser._id);
-          await requestedUser.save(); 
-          await requestingUser.save(); 
+        if (you.requests.includes(theirId._id)) {
+          you.requests.splice(you.requests.indexOf(theirId._id), 1);
+          them.friends.push(yourId._id);
+          you.friends.push(theirId._id);
+          await them.save(); 
+          await you.save(); 
         } else {
           // if you have not already sent a request or are not already friends, send a request to the user
-          if (!requestedUser.requests.includes(pickedRequestingUser._id) && !requestedUser.friends.includes(pickedRequestingUser._id)) {
-            requestedUser.requests.push(pickedRequestingUser._id);
-            await requestedUser.save(); 
+          if (!them.requests.includes(yourId._id) && !them.friends.includes(yourId._id)) {
+            them.requests.push(yourId._id);
+            await them.save(); 
           }
         }
 
         
 
-        return res.status(200).json(pickedRequestedUser);
+        return res.status(200).json(them);
         
       } else {
         return next({
@@ -92,6 +123,7 @@ router.route('/').post(async function(req, res, next) {
   }
 });
 
+// Delete a friend or Reject a friend request
 router.route('/').delete(async function(req, res, next) {
   try {
     console.log('params:', req.params);

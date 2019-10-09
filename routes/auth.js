@@ -41,20 +41,28 @@ router.post('/signin', async function(req, res, next) {
       email: req.body.email
     });
     debugger;
-    let { id, username, profileImageUrl } = user;
+    let { id, username, profileImageUrl, friends, posts, requests } = user;
     let isMatch = await user.comparePassword(req.body.password);
+
+    console.log('auth route, /signin, posts', posts);
 
     if (isMatch) {
       let token = jwt.sign({
         id,
         username,
-        profileImageUrl
+        profileImageUrl,
+        friends,
+        posts,
+        requests
       }, process.env.SECRET_KEY);
 
       return res.status(200).json({
         id,
         username,
         profileImageUrl,
+        friends,
+        posts,
+        requests,
         token
       });
     } else {

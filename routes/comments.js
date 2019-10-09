@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 const db = require('../models');
 
+
+
 // create a new comment
 router.route('/').post(async function(req, res, next) {
   try {
