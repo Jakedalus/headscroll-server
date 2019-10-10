@@ -11,9 +11,8 @@ exports.getFriends = function(req, res, next) {
         let friends = user.friends;
         console.log('getFriends: ', decoded, user);
         console.log();
-        // return res.send({friends});
         res.locals.friends = friends;
-        // res.locals.you = user;
+        res.locals.you = user._id;
         return next();
       } else {
         return next({
