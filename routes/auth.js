@@ -34,13 +34,11 @@ router.post('/signup', async function(req, res, next) {
 });
 
 router.post('/signin', async function(req, res, next) {
-  debugger;
   try {
-    debugger;
     let user = await db.User.findOne({
       email: req.body.email
     });
-    debugger;
+
     let { id, username, profileImageUrl, friends, posts, requests } = user;
     let isMatch = await user.comparePassword(req.body.password);
 

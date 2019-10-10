@@ -4,6 +4,7 @@ const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
 var _ = require('lodash');
+const jwt = require('jsonwebtoken');
 
 const db = require("./models");
 const errorHandler = require('./handlers/error');
@@ -20,6 +21,38 @@ app.use(cors());
 app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
+
+// get user data again if signed in
+app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, next) {
+  try {
+    let user = await db.User.findById(req.params.id);
+
+    const pickedUser = _.pick(user, ['username', 'email', 'id', 'friends', 'posts', 'requests']);
+
+    let { id, username, profileImageUrl, friends, posts, requests } = pickedUser;
+
+    let token = jwt.sign({
+      id,
+      username,
+      profileImageUrl,
+      friends,
+      posts,
+      requests
+    }, process.env.SECRET_KEY);
+
+    pickedUser.token = token;
+
+    console.log('/user route:', req.params, user, pickedUser);
+
+    return res.status(200).json(pickedUser);
+
+  } catch (err) {
+    return next({
+      status: 401,
+      message: 'Please log in first'
+    });
+  }
+})
 
 // GET specific post 
 app.get('/api/users/:id/posts/:post_id/', loginRequired, getFriends, async function(req, res, next) {
