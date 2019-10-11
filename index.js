@@ -25,7 +25,11 @@ app.use('/api/auth', authRoutes);
 // get user data again if signed in
 app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, next) {
   try {
-    let user = await db.User.findById(req.params.id);
+    let user = await db.User.findById(req.params.id)
+      .populate('requests', {
+        username: true,
+        id: true
+      });
 
     const pickedUser = _.pick(user, ['username', 'email', 'id', 'friends', 'posts', 'requests']);
 
@@ -42,7 +46,7 @@ app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, 
 
     pickedUser.token = token;
 
-    console.log('/user route:', req.params, user, pickedUser);
+    console.log('--->> /user/:id route:', req.params, user, pickedUser);
 
     return res.status(200).json(pickedUser);
 

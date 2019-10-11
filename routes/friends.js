@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 // GET profile of a friend
 router.route('/').get(async function(req, res, next) {
   try {
-    console.log('params:', req.params);
+    // console.log('params:', req.params);
 
     let user = await db.User.findById(req.params.id); // the user you are looking at
 
@@ -15,7 +15,7 @@ router.route('/').get(async function(req, res, next) {
       if (decoded) {
         
         let you = await db.User.findById(decoded.id); // you
-        console.log('req.params.id === you._id',req.params.id, you._id, req.params.id == you._id);
+        // console.log('req.params.id === you._id',req.params.id, you._id, req.params.id == you._id);
         // if you are friends with them, or you're on your own profile, you see the whole profile
         if (user.friends.includes(you._id) || req.params.id == you._id) {
           const picked = (({ _id, email, username, posts, friends, isFriend=true }) => ({
@@ -25,7 +25,7 @@ router.route('/').get(async function(req, res, next) {
 
           let friends = [];
           for (let friend of picked.friends) {
-            console.log('Looking up friend:', friend);
+            // console.log('Looking up friend:', friend);
             let pal = await db.User.findById(friend);
             const pickedPal = (({ 
               _id, 
@@ -39,7 +39,7 @@ router.route('/').get(async function(req, res, next) {
 
           picked.friends = friends;
 
-          console.log('users route, GET, user, is friends:', picked);
+          // console.log('friends route, GET, user, is friends:', picked);
 
           return res.status(200).json(picked);
         // not friends with the user
@@ -55,7 +55,7 @@ router.route('/').get(async function(req, res, next) {
             _id, email, username, youRequestedAlready, theyRequestedAlready, isFriend  
           }))(user);
 
-          console.log('users route, GET, user, is not friends:', picked);
+          // console.log('friends route, GET, user, is not friends:', picked);
 
           return res.status(200).json(picked);
         }
@@ -89,7 +89,7 @@ router.route('/').post(async function(req, res, next) {
         const theirId = (({ _id }) => ({ _id }))(them);
         const yourId = (({ _id }) => ({ _id }))(you);
 
-        console.log('users route, POST, user, _id:', theirId, yourId);
+        // console.log('friends route, POST, user, _id:', theirId, yourId);
 
         // if the other user has already requested you as a friend
         if (you.requests.includes(theirId._id)) {
@@ -138,7 +138,7 @@ router.route('/').delete(async function(req, res, next) {
         const pickedRequestedUser = (({ _id }) => ({ _id }))(requestedUser);
         const pickedRequestingUser = (({ _id }) => ({ _id }))(requestingUser);
 
-        console.log('users route, POST, user, _id:', pickedRequestedUser, pickedRequestingUser);
+        // console.log('friends route, POST, user, _id:', pickedRequestedUser, pickedRequestingUser);
 
         // if the other user has already requested you as a friend
         if (requestingUser.requests.includes(pickedRequestedUser._id)) {

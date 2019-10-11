@@ -9,8 +9,8 @@ exports.getFriends = function(req, res, next) {
       if (decoded) {
         let user = await db.User.findById(decoded.id);
         let friends = user.friends;
-        console.log('getFriends: ', decoded, user);
-        console.log();
+        // console.log('getFriends: ', decoded, user);
+        // console.log();
         res.locals.friends = friends;
         res.locals.you = user._id;
         return next();
