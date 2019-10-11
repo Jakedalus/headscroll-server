@@ -6,9 +6,12 @@ const db = require('../models');
 
 // create a new comment
 router.route('/').post(async function(req, res, next) {
+
+  console.log('comments/ POST route:', req.body, req.params);
+
   try {
     let comment = await db.Comment.create({
-      text: req.body.text,
+      text: req.body.comment,
       user: req.params.id,
       post: req.params.post_id
     });
