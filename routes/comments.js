@@ -61,6 +61,7 @@ router.route('/:comment_id').put(async function(req, res, next) {
 
 // // delete a comment
 router.route('/:comment_id').delete(async function(req, res, next) {
+  console.log('/routes/comments, DELETE comment route:', req.body);
   try {
     let foundComment = await db.Comment.findById(req.params.comment_id);
 

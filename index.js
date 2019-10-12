@@ -56,7 +56,15 @@ app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, 
       message: 'Please log in first'
     });
   }
-})
+});
+
+
+// comments routes to create, update, and delete comments
+app.use('/api/users/:id/posts/:post_id/comments',
+  loginRequired,
+  ensureCorrectUser,
+  commentsRoutes
+);
 
 // GET specific post 
 app.get('/api/users/:id/posts/:post_id/', loginRequired, getFriends, async function(req, res, next) {
@@ -83,6 +91,8 @@ app.use('/api/users/:id/posts',
   postsRoutes
 );
 
+
+
 // get comments on a post
 // app.get('/api/users/:id/posts/:post_id/comments', loginRequired, getFriends, async function(req, res, next) {
 //   console.log('!!comments get route!');
@@ -102,12 +112,7 @@ app.use('/api/users/:id/posts',
 //   }
 // });
 
-// comments routes to create, update, and delete comments
-app.use('/api/users/:id/posts/:post_id/comments',
-  loginRequired,
-  ensureCorrectUser,
-  commentsRoutes
-);
+
 
 // friendssRoutes to display friend info and add/removefriends
 app.use('/api/users/:id/profile', loginRequired, friendsRoutes);

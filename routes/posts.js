@@ -4,6 +4,7 @@ const db = require('../models');
 
 // create a new post
 router.route('/').post(async function(req, res, next) {
+  console.log('/routes/posts, POST new post:', req.body);
   try {
     let post = await db.Post.create({
       text: req.body.text,
