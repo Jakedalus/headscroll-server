@@ -16,7 +16,7 @@ const postSchema = new mongoose.Schema({
     ref: 'Comment'
   }]
 }, {
-  timeStamps: true
+  timestamps: true
 });
 
 postSchema.pre('remove', async function(next) {

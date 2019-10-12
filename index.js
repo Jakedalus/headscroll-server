@@ -120,7 +120,7 @@ app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next)
     console.log('/api/scroll, res.locals:', res.locals);
     let posts = await db.Post.find({ $or: [{ user: { $in: res.locals.friends }}, { user: res.locals.you }] })
     // let posts = await db.Post.find({ user: { $in: res.locals.friends }})
-      .sort({createdAt: 'asc'})
+      .sort({createdAt: 'desc'})
       .populate('user', {
         username: true,
         profileImageUrl: true

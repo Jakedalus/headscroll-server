@@ -18,7 +18,7 @@ const commentSchema = new mongoose.Schema({
     required: true
   }
 }, {
-  timeStamps: true
+  timestamps: true
 });
 
 commentSchema.pre('remove', async function(next) {
