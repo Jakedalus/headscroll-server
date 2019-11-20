@@ -141,12 +141,33 @@ app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next)
 app.post('/api/search', loginRequired, async function(req, res, next) {
   try {
     console.log('/api/search route:', req.body, req.query);
-    let foundUser = await db.User.findOne({username: req.body.query});
-    // let foundUser = await db.User.find({email: req.body.query});
 
-    const pickedUser = _.pick(foundUser, ['username', 'email', '_id']);
+    let foundUser = null;
+    let pickedUser = null;
 
-    res.status(200).json({pickedUser});
+    // search via username
+    foundUser = await db.User.findOne({username: req.body.query});
+    console.log('...search via username:', foundUser);
+    if (foundUser) {
+      pickedUser = _.pick(foundUser, ['username', 'email', '_id']);
+      console.log('...Found via username!',foundUser, pickedUser);
+      return res.status(200).json({pickedUser});
+    }
+
+    // search via email
+    foundUser = await db.User.findOne({email: req.body.query});
+    console.log('...search via email:', foundUser);
+    if (foundUser) {
+      pickedUser = _.pick(foundUser, ['username', 'email', '_id']);
+      console.log('...Found via email!',foundUser, pickedUser);
+      return res.status(200).json({pickedUser});
+    }
+
+    return next({
+      status: 404,
+      message: 'User not found'
+    });
+    
   } catch (err) {
     return next(err);
   }
