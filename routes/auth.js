@@ -37,7 +37,10 @@ router.post('/signin', async function(req, res, next) {
   try {
     let user = await db.User.findOne({
       email: req.body.email
-    });
+    }).populate('requests', {  // populate friend requests with username and id when log in
+      username: true,
+      id: true
+    });;
 
     let { id, username, profileImageUrl, friends, posts, requests } = user;
     let isMatch = await user.comparePassword(req.body.password);

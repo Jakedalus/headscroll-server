@@ -146,6 +146,7 @@ app.post('/api/search', loginRequired, async function(req, res, next) {
     let pickedUser = null;
 
     // search via username
+    // {'$regex': req.body.query, $options:'i'} makes the search case-insensitive
     foundUser = await db.User.findOne({username: {'$regex': req.body.query, $options:'i'}});
     console.log('...search via username:', foundUser);
     if (foundUser) {
