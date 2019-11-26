@@ -33,12 +33,12 @@ app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, 
 
     const pickedUser = _.pick(user, ['username', 'email', 'id', 'friends', 'posts', 'requests']);
 
-    let { id, username, profileImageUrl, friends, posts, requests } = pickedUser;
+    let { id, username, profileImage, friends, posts, requests } = pickedUser;
 
     let token = jwt.sign({
       id,
       username,
-      profileImageUrl,
+      profileImage,
       friends,
       posts,
       requests
@@ -75,7 +75,7 @@ app.get('/api/users/:id/posts/:post_id/', loginRequired, getFriends, async funct
       .sort({createdAt: 'asc'})
       .populate('user', {
         username: true,
-        profileImageUrl: true
+        profileImage: true
       });
     console.log('GET /:post_id', post, comments);
     return res.status(200).json({post, comments});
@@ -104,7 +104,7 @@ app.use('/api/users/:id/posts',
 //     //   .sort({createdAt: 'desc'})
 //     //   .populate('user', {
 //     //     username: true,
-//     //     profileImageUrl: true
+//     //     profileImage: true
 //     //   });
 //     // return res.status(200).json(posts);
 //   } catch (err) {
@@ -121,6 +121,7 @@ app.use('/api/users/:id/profile', loginRequired, friendsRoutes);
 
 // GET scroll route that displays friends' posts
 app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next) {
+  console.log('/api/scroll:', req, res);
   try {
     console.log('/api/scroll, res.locals:', res.locals);
     let posts = await db.Post.find({ $or: [{ user: { $in: res.locals.friends }}, { user: res.locals.you }] })
@@ -128,7 +129,7 @@ app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next)
       .sort({createdAt: 'desc'})
       .populate('user', {
         username: true,
-        profileImageUrl: true
+        profileImage: true
       });
     
     return res.status(200).json(posts);

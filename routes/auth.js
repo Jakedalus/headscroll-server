@@ -14,21 +14,24 @@ router.post('/signup', upload.single('profileImage'), async function(req, res, n
     console.log('req.body:', req.body);
     console.log('req.file:', req.file);
 
-    // let user = await db.User.create(req.body);
+    let user = await db.User.create({
+      ...req.body, 
+      // profileImage: req.file.buffer 
+    });
 
-    // let { id, username, profileImageUrl } = user;
-    // let token = jwt.sign({
-    //   id,
-    //   username,
-    //   profileImageUrl
-    // }, process.env.SECRET_KEY);
+    let { id, username, profileImage } = user;
+    let token = jwt.sign({
+      id,
+      username,
+      profileImage
+    }, process.env.SECRET_KEY);
 
-    // return res.status(200).json({
-    //   id,
-    //   username,
-    //   profileImageUrl,
-    //   token
-    // });
+    return res.status(200).json({
+      id,
+      username,
+      profileImage,
+      token
+    });
 
   } catch (err) {
     if (err.code === 11000) {
@@ -51,7 +54,7 @@ router.post('/signin', async function(req, res, next) {
       id: true
     });;
 
-    let { id, username, profileImageUrl, friends, posts, requests } = user;
+    let { id, username, profileImage, friends, posts, requests } = user;
     let isMatch = await user.comparePassword(req.body.password);
 
     console.log('auth route, /signin, posts', posts);
@@ -60,7 +63,7 @@ router.post('/signin', async function(req, res, next) {
       let token = jwt.sign({
         id,
         username,
-        profileImageUrl,
+        // profileImage,  // DON'T INCLUDE profileImage BECAUSE THE BINARY MAKES THE TOKEN HUGE
         friends,
         posts,
         requests
@@ -69,7 +72,7 @@ router.post('/signin', async function(req, res, next) {
       return res.status(200).json({
         id,
         username,
-        profileImageUrl,
+        profileImage,
         friends,
         posts,
         requests,

@@ -27,7 +27,7 @@ router.route('/').post(async function(req, res, next) {
     let foundComment = await db.Comment.findById(comment._id)
       .populate('user', {
         username: true,
-        profileImageUrl: true
+        profileImage: true
       });
 
     return res.status(200).json(foundComment);

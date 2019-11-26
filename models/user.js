@@ -16,8 +16,8 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: true
   }, 
-  profileImageUrl: {
-    type: String
+  profileImage: {
+    type: Buffer
   },
   posts: [{
     type: mongoose.Schema.Types.ObjectId,
