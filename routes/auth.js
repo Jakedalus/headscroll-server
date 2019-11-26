@@ -2,24 +2,33 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const db = require('../models');
+const multer  = require('multer');
+var storage = multer.memoryStorage()
+var upload = multer({ storage: storage })
+// const upload = multer({ dest: 'uploads/' });
 
-router.post('/signup', async function(req, res, next) {
+router.post('/signup', upload.single('profileImage'), async function(req, res, next) {
+// router.post('/signup', async function(req, res, next) {
   try {
-    let user = await db.User.create(req.body);
 
-    let { id, username, profileImageUrl } = user;
-    let token = jwt.sign({
-      id,
-      username,
-      profileImageUrl
-    }, process.env.SECRET_KEY);
+    console.log('req.body:', req.body);
+    console.log('req.file:', req.file);
 
-    return res.status(200).json({
-      id,
-      username,
-      profileImageUrl,
-      token
-    });
+    // let user = await db.User.create(req.body);
+
+    // let { id, username, profileImageUrl } = user;
+    // let token = jwt.sign({
+    //   id,
+    //   username,
+    //   profileImageUrl
+    // }, process.env.SECRET_KEY);
+
+    // return res.status(200).json({
+    //   id,
+    //   username,
+    //   profileImageUrl,
+    //   token
+    // });
 
   } catch (err) {
     if (err.code === 11000) {
