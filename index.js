@@ -121,7 +121,7 @@ app.use('/api/users/:id/profile', loginRequired, friendsRoutes);
 
 // GET scroll route that displays friends' posts
 app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next) {
-  console.log('/api/scroll:', req, res);
+  // console.log('/api/scroll:', req, res);
   try {
     console.log('/api/scroll, res.locals:', res.locals);
     let posts = await db.Post.find({ $or: [{ user: { $in: res.locals.friends }}, { user: res.locals.you }] })

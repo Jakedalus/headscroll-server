@@ -11,19 +11,19 @@ router.post('/signup', upload.single('profileImage'), async function(req, res, n
 // router.post('/signup', async function(req, res, next) {
   try {
 
-    console.log('req.body:', req.body);
-    console.log('req.file:', req.file);
+    console.log('/signup, req.body:', req.body);
+    console.log('/signup, req.file:', req.file);
 
     let user = await db.User.create({
       ...req.body, 
-      // profileImage: req.file.buffer 
+      profileImage: req.file.buffer 
     });
 
     let { id, username, profileImage } = user;
     let token = jwt.sign({
       id,
       username,
-      profileImage
+      // profileImage  // DON'T INCLUDE profileImage BECAUSE THE BINARY MAKES THE TOKEN HUGE
     }, process.env.SECRET_KEY);
 
     return res.status(200).json({
@@ -57,7 +57,9 @@ router.post('/signin', async function(req, res, next) {
     let { id, username, profileImage, friends, posts, requests } = user;
     let isMatch = await user.comparePassword(req.body.password);
 
+    console.log('auth route, /signin, user', user);
     console.log('auth route, /signin, posts', posts);
+    console.log('auth route, /signin, profileImage', profileImage);
 
     if (isMatch) {
       let token = jwt.sign({
