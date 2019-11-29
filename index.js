@@ -31,14 +31,14 @@ app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, 
         id: true
       });
 
-    const pickedUser = _.pick(user, ['username', 'email', 'id', 'friends', 'posts', 'requests']);
+    const pickedUser = _.pick(user, ['username', 'email', 'id', 'friends', 'posts', 'requests', 'profileImage']);
 
     let { id, username, profileImage, friends, posts, requests } = pickedUser;
 
     let token = jwt.sign({
       id,
       username,
-      profileImage,
+      // profileImage,
       friends,
       posts,
       requests
