@@ -2,7 +2,22 @@ const express = require('express');
 const router = express.Router({mergeParams: true});
 const db = require('../models');
 
-
+// get all comments on a post
+router.route('/').get(async function(req, res, next) {
+  console.log('GET /api/users/:id/posts/:post_id/comments/');
+  try {
+    let comments = await db.Comment.find({post: req.params.post_id})
+      .sort({createdAt: 'asc'})
+      .populate('user', {
+        username: true,
+        profileImage: true
+      });
+    console.log('GET /:post_id/comments', comments);
+    return res.status(200).json(comments);
+  } catch (err) {
+    return next(err);
+  }
+});
 
 // create a new comment
 router.route('/').post(async function(req, res, next) {
