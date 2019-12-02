@@ -18,8 +18,8 @@ router.route('/').get(async function(req, res, next) {
         // console.log('req.params.id === you._id',req.params.id, you._id, req.params.id == you._id);
         // if you are friends with them, or you're on your own profile, you see the whole profile
         if (user.friends.includes(you._id) || req.params.id == you._id) {
-          const picked = (({ _id, email, username, posts, friends, isFriend=true }) => ({
-             _id, email, username, posts, friends, isFriend  
+          const picked = (({ _id, email, username, posts, friends, profileImage, isFriend=true }) => ({
+             _id, email, username, profileImage, posts, friends, isFriend  
           }))(user);
 
 
@@ -30,9 +30,10 @@ router.route('/').get(async function(req, res, next) {
             const pickedPal = (({ 
               _id, 
               email, 
-              username
+              username,
+              profileImage
             }) => ({ 
-              _id, email, username  
+              _id, email, username, profileImage
             }))(pal);
             friends.push(pickedPal);
           }
