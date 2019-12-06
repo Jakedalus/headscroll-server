@@ -58,6 +58,23 @@ app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, 
   }
 });
 
+//GET comments on a post 
+app.get('/api/users/:id/posts/:post_id/comments', loginRequired, getFriends, async function(req, res, next) {
+  console.log('GET /api/users/:id/posts/:post_id/comments/');
+  console.log('GET /api/users/:id/posts/:post_id/comments, res.locals', res.locals);
+  try {
+    let comments = await db.Comment.find({post: req.params.post_id})
+      .sort({createdAt: 'asc'})
+      .populate('user', {
+        username: true,
+        profileImage: true
+      });
+    console.log('GET /:post_id/comments', comments);
+    return res.status(200).json(comments);
+  } catch (err) {
+    return next(err);
+  }
+});
 
 // comments routes to create, update, and delete comments
 app.use('/api/users/:id/posts/:post_id/comments',
@@ -111,6 +128,8 @@ app.use('/api/users/:id/posts',
 //     return next(err);
 //   }
 // });
+
+
 
 
 
