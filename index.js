@@ -66,12 +66,28 @@ app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, 
 app.post('/api/users/:id/profile/avi', loginRequired, ensureCorrectUser, upload.single('profileImage'), async function(req, res, next) {
   console.log('POST /api/users/:id/profile/avi, req.params:', req.params);
   console.log('POST /api/users/:id/profile/avi, req.file:', req.file);
-  let foundUser = await db.User.findById(req.params.id);
-  console.log('foundUser', foundUser);
-  foundUser.profileImage = req.file.buffer;
-  await foundUser.save();
-
-  return res.status(200).json({profileImage: foundUser.profileImage});
+  try {
+    if (req.file.mimetype === 'image/png' || req.file.mimetype === 'image/jpeg') {
+      let foundUser = await db.User.findById(req.params.id);
+      // console.log('foundUser', foundUser);
+      foundUser.profileImage = req.file.buffer;
+      await foundUser.save();
+  
+      return res.status(200).json({profileImage: foundUser.profileImage});
+    } else {
+      console.log('!!!NOT AN IMAGE FILE!!!');
+      return next({
+        status: 404,
+        message: 'Please upload a valid image file'
+      });
+    };
+  } catch(err) {
+    return next({
+      status: 404,
+      message: 'Please upload a valid image file'
+    });
+  }
+  
 });
 
 // GET comments on a post 

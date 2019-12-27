@@ -27,7 +27,7 @@ exports.ensureCorrectUser = function(req, res, next) {
   try {
     const token = req.headers.authorization.split(" ")[1];
     jwt.verify(token, process.env.SECRET_KEY, async function(err, decoded) {
-      console.log('ensureCorrectUser:', decoded, req.method, req.params, req.path, req.body, req.originalUrl);
+      // console.log('ensureCorrectUser:', decoded, req.method, req.params, req.path, req.body, req.originalUrl);
       // console.log('req.path, cleaned:', req.path.slice(1));
       // console.log('is a "comments" route?', req.originalUrl.includes('comments'));
       
