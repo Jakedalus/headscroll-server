@@ -3,9 +3,8 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const db = require('../models');
 const multer  = require('multer');
-var storage = multer.memoryStorage()
-var upload = multer({ storage: storage })
-// const upload = multer({ dest: 'uploads/' });
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 router.post('/signup', upload.single('profileImage'), async function(req, res, next) {
 // router.post('/signup', async function(req, res, next) {

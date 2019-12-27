@@ -6,6 +6,10 @@ const bodyParser = require('body-parser');
 var _ = require('lodash');
 const jwt = require('jsonwebtoken');
 
+const multer  = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 const db = require("./models");
 const errorHandler = require('./handlers/error');
 const authRoutes = require('./routes/auth');
@@ -22,7 +26,7 @@ app.use(bodyParser.json());
 
 app.use('/api/auth', authRoutes);
 
-// get user data again if signed in
+// GET user data again if signed in
 app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, next) {
   try {
     let user = await db.User.findById(req.params.id)
@@ -58,7 +62,19 @@ app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, 
   }
 });
 
-//GET comments on a post 
+// POST route for uploading profileImage
+app.post('/api/users/:id/profile/avi', loginRequired, ensureCorrectUser, upload.single('profileImage'), async function(req, res, next) {
+  console.log('POST /api/users/:id/profile/avi, req.params:', req.params);
+  console.log('POST /api/users/:id/profile/avi, req.file:', req.file);
+  let foundUser = await db.User.findById(req.params.id);
+  console.log('foundUser', foundUser);
+  foundUser.profileImage = req.file.buffer;
+  await foundUser.save();
+
+  return res.status(200).json({profileImage: foundUser.profileImage});
+});
+
+// GET comments on a post 
 app.get('/api/users/:id/posts/:post_id/comments', loginRequired, getFriends, async function(req, res, next) {
   console.log('GET /api/users/:id/posts/:post_id/comments/');
   console.log('GET /api/users/:id/posts/:post_id/comments, res.locals', res.locals);
@@ -108,35 +124,8 @@ app.use('/api/users/:id/posts',
   postsRoutes
 );
 
-
-
-// get comments on a post
-// app.get('/api/users/:id/posts/:post_id/comments', loginRequired, getFriends, async function(req, res, next) {
-//   console.log('!!comments get route!');
-//   try {
-//     // console.log('friends:', res.locals.friends);
-//     // let posts = await db.Post.find({ user: { $in: res.locals.friends }})
-//     console.log('routes/comments, get "/", req:', req);
-//     // let posts = await db.Comment.find({post: })
-//     //   .sort({createdAt: 'desc'})
-//     //   .populate('user', {
-//     //     username: true,
-//     //     profileImage: true
-//     //   });
-//     // return res.status(200).json(posts);
-//   } catch (err) {
-//     return next(err);
-//   }
-// });
-
-
-
-
-
-// friendssRoutes to display friend info and add/removefriends
+// friendsRoutes to display friend info and add/removefriends
 app.use('/api/users/:id/profile', loginRequired, friendsRoutes);
-
-
 
 // GET scroll route that displays friends' posts
 app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next) {
@@ -193,7 +182,6 @@ app.post('/api/search', loginRequired, async function(req, res, next) {
     return next(err);
   }
 });
-
 
 app.use(function(req, res, next) {
   let err = new Error("Not Found");
