@@ -5,6 +5,13 @@ const db = require('../models');
 // create a new post
 router.route('/').post(async function(req, res, next) {
   console.log('/routes/posts, POST new post:', req.body);
+  if (req.body.text === '') {
+    return next({
+      status: 400,
+      message: 'Your post cannot be empty'
+    });
+  };
+  
   try {
     let post = await db.Post.create({
       text: req.body.text,

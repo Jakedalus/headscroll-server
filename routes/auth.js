@@ -9,6 +9,16 @@ const upload = multer({ storage: storage });
 router.post('/signup', upload.single('profileImage'), async function(req, res, next) {
 // router.post('/signup', async function(req, res, next) {
   try {
+    
+    if (req.body.username === '' ||
+        req.body.email === '' ||
+        req.body.password === ''
+    ) {
+      return next({
+        status: 400,
+        message: 'Please include all necesarry information'
+      });
+    }
 
     console.log('/signup, req.body:', req.body);
     console.log('/signup, req.file:', req.file);
