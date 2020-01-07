@@ -25,8 +25,10 @@ router.post('/signup', upload.single('profileImage'), async function(req, res, n
 
     let user = await db.User.create({
       ...req.body, 
-      profileImage: req.file.buffer 
+      profileImage: req.file ? req.file.buffer : null
     });
+
+    console.log('/signup, user:', user);
 
     let { id, username, profileImage } = user;
     let token = jwt.sign({
