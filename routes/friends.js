@@ -49,11 +49,12 @@ router.route('/').get(async function(req, res, next) {
             _id, 
             email, 
             username, 
+            profileImage,
             youRequestedAlready=user.requests.includes(you._id), 
             theyRequestedAlready=you.requests.includes(user._id),
             isFriend=false 
           }) => ({ 
-            _id, email, username, youRequestedAlready, theyRequestedAlready, isFriend  
+            _id, email, username, profileImage, youRequestedAlready, theyRequestedAlready, isFriend  
           }))(user);
 
           // console.log('friends route, GET, user, is not friends:', picked);
