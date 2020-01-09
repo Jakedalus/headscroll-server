@@ -175,7 +175,7 @@ app.post('/api/search', loginRequired, async function(req, res, next) {
     foundUser = await db.User.findOne({username: {'$regex': req.body.query, $options:'i'}});
     console.log('...search via username:', foundUser);
     if (foundUser) {
-      pickedUser = _.pick(foundUser, ['username', 'email', '_id']);
+      pickedUser = _.pick(foundUser, ['username', 'email', '_id', 'profileImage']);
       console.log('...Found via username!',foundUser, pickedUser);
       return res.status(200).json({pickedUser});
     }
@@ -184,7 +184,7 @@ app.post('/api/search', loginRequired, async function(req, res, next) {
     foundUser = await db.User.findOne({email: {'$regex': req.body.query, $options:'i'}});
     console.log('...search via email:', foundUser);
     if (foundUser) {
-      pickedUser = _.pick(foundUser, ['username', 'email', '_id']);
+      pickedUser = _.pick(foundUser, ['username', 'email', '_id', 'profileImage']);
       console.log('...Found via email!',foundUser, pickedUser);
       return res.status(200).json({pickedUser});
     }
