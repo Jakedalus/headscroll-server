@@ -27,7 +27,7 @@ app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
 
 // GET user data again if signed in
-app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, next) {
+app.get('/api/user/:id', loginRequired, ensureCorrectUser, async function(req, res, next) {
   try {
     let user = await db.User.findById(req.params.id)
       .populate('requests', {
