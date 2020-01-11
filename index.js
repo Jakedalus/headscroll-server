@@ -50,7 +50,7 @@ app.get('/user/:id', loginRequired, ensureCorrectUser, async function(req, res, 
 
     pickedUser.token = token;
 
-    console.log('--->> /user/:id route:', req.params, user, pickedUser);
+    console.log('--->> GET /user/:id route:', req.params, user, pickedUser);
 
     return res.status(200).json(pickedUser);
 
