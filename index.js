@@ -146,15 +146,17 @@ app.use('/api/users/:id/profile', loginRequired, friendsRoutes);
 // GET scroll route that displays friends' posts
 app.get('/api/scroll', loginRequired, getFriends, async function(req, res, next) {
   // console.log('/api/scroll:', req, res);
+  console.log('/api/scroll:');
   try {
     console.log('/api/scroll, res.locals:', res.locals);
     let posts = await db.Post.find({ $or: [{ user: { $in: res.locals.friends }}, { user: res.locals.you }] })
-    // let posts = await db.Post.find({ user: { $in: res.locals.friends }})
       .sort({createdAt: 'desc'})
       .populate('user', {
         username: true,
         profileImage: true
       });
+
+    console.log('/api/scroll, posts:', posts);
     
     return res.status(200).json(posts);
   } catch (err) {
