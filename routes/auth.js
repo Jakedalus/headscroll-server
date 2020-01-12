@@ -49,6 +49,8 @@ router.post('/signup', upload.single('profileImage'), async function(req, res, n
       err.message = 'Sorry, that username and/or email is taken.'
     }
 
+    console.log('/signup, err:', err);
+
     return next({
       status: 400,
       message: err.message
