@@ -7,7 +7,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 router.post('/signup', upload.single('profileImage'), async function(req, res, next) {
-// router.post('/signup', async function(req, res, next) {
+  console.log('/signup route!');
   try {
     
     if (req.body.username === '' ||
