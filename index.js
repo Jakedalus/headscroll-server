@@ -22,7 +22,7 @@ const { getFriends } = require('./middleware/friends');
 const PORT = process.env.PORT || 5051;
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '1mb'}));
 
 app.use('/api/auth', authRoutes);
 
