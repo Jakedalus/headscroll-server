@@ -96,13 +96,13 @@ router.post('/signin', async function(req, res, next) {
     } else {
       return next({
         status: 400,
-        message: 'Invalid Email/Password, no match'
+        message: 'Invalid Email/Password'
       });
     }
   } catch (err) {
     return next({
       status: 400,
-      message: 'Invalid email/password, catch block'
+      message: 'Invalid email/password'
     });
   }
 });
